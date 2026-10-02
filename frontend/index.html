@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Tutor Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#" onclick="switchTab('search'); return false;">Home Tutor</a>
+
+      <nav class="nav">
+        <button class="nav-link active" id="tab-search-btn" onclick="switchTab('search')">Find tutors</button>
+        <button class="nav-link" id="tab-requests-btn" onclick="switchTab('requests')">Requests</button>
+      </nav>
+
+      <div class="account" id="account-area"></div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── Search view ── -->
+    <section id="view-search">
+
+      <div class="hero">
+        <svg class="waves" viewBox="0 0 1200 500" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 120 C 200 80, 350 170, 600 120 S 1000 70, 1200 130" />
+          <path d="M0 150 C 220 110, 380 200, 620 150 S 980 100, 1200 160" />
+          <path d="M0 260 C 180 300, 420 210, 640 260 S 1020 310, 1200 250" />
+          <path d="M0 290 C 200 330, 440 240, 660 290 S 1000 340, 1200 280" />
+          <path d="M0 400 C 240 360, 400 440, 620 400 S 960 360, 1200 410" />
+          <path d="M0 430 C 260 390, 420 470, 640 430 S 980 390, 1200 440" />
+        </svg>
+
+        <div class="wrap hero-inner">
+          <div class="hero-top">
+            <span class="eyebrow">Scroll ↓</span>
+            <span class="pill-outline">Parents · Tutors</span>
+          </div>
+
+          <h1 class="hero-title">Find a<br>Home Tutor<br>Near You.</h1>
+
+          <div class="hero-bottom">
+            <p class="hero-copy">Search verified tutors by subject and locality. Pick a slot, send a request — one student per slot, always.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="band" id="search-band">
+        <div class="wrap">
+          <p class="eyebrow">01 — Search</p>
+          <form class="search-row" onsubmit="searchTutors(); return false;">
+            <label class="line-field">
+              <span class="eyebrow">Subject</span>
+              <input type="text" id="search-subject" placeholder="Maths, Physics…">
+            </label>
+            <label class="line-field">
+              <span class="eyebrow">Locality</span>
+              <input type="text" id="search-locality" placeholder="Kharghar, Nerul…">
+            </label>
+            <div class="search-actions">
+              <button type="submit" class="btn btn-accent">Search →</button>
+              <button type="button" class="btn btn-link" onclick="clearSearch()">Clear</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="wrap section">
+        <div class="section-head">
+          <p class="eyebrow">02 — Available tutors</p>
+          <span class="eyebrow" id="tutor-count"></span>
+        </div>
+        <div class="tutor-grid" id="tutor-cards-container">
+          <p class="empty">Loading tutors…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Requests view ── -->
+    <section id="view-requests" hidden>
+      <div class="wrap section page-top">
+        <div class="page-head">
+          <h1 class="page-title" id="requests-view-title">Requests</h1>
+          <div class="page-head-side">
+            <p class="small-caps">A tutor can accept only one student per time slot.</p>
+            <button class="btn btn-outline" onclick="loadMyRequests()">Refresh ↻</button>
+          </div>
+        </div>
+        <div id="requests-list" class="request-list"></div>
+      </div>
+    </section>
+
+    <!-- ── Sign in / create account ── -->
+    <section id="view-login" hidden>
+      <div class="wrap section page-top auth">
+        <div>
+          <h1 class="page-title" id="auth-title">Sign<br>In.</h1>
+          <p class="small-caps auth-note" id="auth-note">Choose who you are, then sign in.</p>
+        </div>
+
+        <form class="auth-form" id="auth-form" onsubmit="handleAuth(); return false;">
+
+          <div class="field-group">
+            <span class="eyebrow">I am a</span>
+            <div class="toggle" role="radiogroup">
+              <button type="button" class="toggle-btn active" data-role="parent" onclick="setAuthRole('parent')">Parent</button>
+              <button type="button" class="toggle-btn" data-role="tutor" onclick="setAuthRole('tutor')">Tutor</button>
+            </div>
+          </div>
+
+          <label class="line-field signup-only">
+            <span class="eyebrow">Full name</span>
+            <input type="text" id="reg-name" placeholder="Your name">
+          </label>
+          <label class="line-field">
+            <span class="eyebrow">Email</span>
+            <input type="email" id="login-email" placeholder="name@example.com" required>
+          </label>
+          <label class="line-field">
+            <span class="eyebrow">Password</span>
+            <input type="password" id="login-password" placeholder="••••••••" required>
+          </label>
+
+          <!-- Tutor sign-up: resume upload (sent to the backend with multer) -->
+          <div class="line-field tutor-resume-field" id="reg-resume-field">
+            <span class="eyebrow">Resume — shown to parents</span>
+            <label class="file-pick">
+              <input type="file" id="reg-resume" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="showFileName(this)">
+              <span class="btn btn-outline btn-sm">Choose file</span>
+              <span class="file-name" data-empty="PDF, Word, PNG or JPG · max 5 MB">PDF, Word, PNG or JPG · max 5 MB</span>
+            </label>
+          </div>
+
+          <!-- Tutor sign-up: teaching details + resume -->
+          <div class="tutor-signup signup-only">
+            <p class="eyebrow block-title">Teaching details</p>
+            <div class="two-col">
+              <label class="line-field">
+                <span class="eyebrow">Subjects (comma separated)</span>
+                <input type="text" id="reg-subjects" placeholder="Maths, Physics">
+              </label>
+              <label class="line-field">
+                <span class="eyebrow">Locality</span>
+                <input type="text" id="reg-locality" placeholder="Kharghar">
+              </label>
+            </div>
+            <label class="line-field">
+              <span class="eyebrow">Available slots (comma separated)</span>
+              <input type="text" id="reg-slots" placeholder="Monday 5PM, Wednesday 5PM">
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-accent" id="auth-submit">Sign in →</button>
+
+          <p class="hint">
+            <span id="auth-switch-text">New here?</span>
+            <button type="button" class="btn-inline" id="auth-switch-btn" onclick="setAuthMode(authMode === 'login' ? 'signup' : 'login')">Create an account</button>
+          </p>
+          <p class="hint login-only">Demo — parent <code>paarshvi@example.com</code> · tutor <code>rahul@gmail.com</code> · <code>Password@123</code></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <svg class="slant" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="58" x2="1200" y2="2" /></svg>
+    <div class="wrap footer-inner">
+      <span>Home Tutor Marketplace</span>
+    </div>
+  </footer>
+
+  <!-- ── Hire modal ── -->
+  <div class="modal-overlay" id="hire-modal" onclick="if (event.target === this) closeHireModal()">
+    <div class="modal">
+      <div class="modal-head">
+        <p class="eyebrow">Send request</p>
+        <button class="icon-btn" onclick="closeHireModal()" aria-label="Close">✕</button>
+      </div>
+
+      <input type="hidden" id="modal-tutor-id">
+      <h2 class="modal-tutor" id="modal-tutor-name"></h2>
+
+      <div class="modal-fields">
+        <label class="line-field">
+          <span class="eyebrow">Subject</span>
+          <select id="modal-subject-select"></select>
+        </label>
+        <label class="line-field">
+          <span class="eyebrow">Time slot</span>
+          <select id="modal-slot-select"></select>
+        </label>
+        <label class="line-field">
+          <span class="eyebrow">Message (optional)</span>
+          <textarea id="modal-message" rows="2" placeholder="Weekly revision for Class 10 Maths"></textarea>
+        </label>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn btn-link" onclick="closeHireModal()">Cancel</button>
+        <button class="btn btn-accent" onclick="submitHireRequest()">Send request →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

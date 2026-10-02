@@ -1,0 +1,118 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Home Tutor Marketplace REST API",
+  "collectionId": "thunder-home-tutor-api",
+  "dateExported": "2026-10-01",
+  "version": "1.1",
+  "folders": [
+    {
+      "_id": "f_auth",
+      "name": "1. Authentication",
+      "containerId": ""
+    },
+    {
+      "_id": "f_tutors",
+      "name": "2. Tutors",
+      "containerId": ""
+    },
+    {
+      "_id": "f_requests",
+      "name": "3. Hire Requests",
+      "containerId": ""
+    }
+  ],
+  "requests": [
+    {
+      "_id": "req_health",
+      "colId": "thunder-home-tutor-api",
+      "name": "0. Health Check",
+      "url": "http://localhost:5000/api/health",
+      "method": "GET",
+      "headers": []
+    },
+    {
+      "_id": "req_parent_login",
+      "colId": "thunder-home-tutor-api",
+      "containerId": "f_auth",
+      "name": "Parent Login",
+      "url": "http://localhost:5000/api/auth/login",
+      "method": "POST",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"paarshvi@example.com\",\n  \"password\": \"Password@123\"\n}"
+      }
+    },
+    {
+      "_id": "req_tutor_login",
+      "colId": "thunder-home-tutor-api",
+      "containerId": "f_auth",
+      "name": "Tutor Login",
+      "url": "http://localhost:5000/api/auth/login",
+      "method": "POST",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"rahul@gmail.com\",\n  \"password\": \"Password@123\"\n}"
+      }
+    },
+    {
+      "_id": "req_search_tutors",
+      "colId": "thunder-home-tutor-api",
+      "containerId": "f_tutors",
+      "name": "Search Tutors (req.query)",
+      "url": "http://localhost:5000/api/tutors?subject=Maths&locality=Kharghar",
+      "method": "GET",
+      "headers": []
+    },
+    {
+      "_id": "req_create_hire_request",
+      "colId": "thunder-home-tutor-api",
+      "containerId": "f_requests",
+      "name": "Create Hire Request",
+      "url": "http://localhost:5000/api/hire-requests",
+      "method": "POST",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{TOKEN}}" }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"tutor\": \"TUTOR_ID_HERE\",\n  \"subject\": \"Maths\",\n  \"slot\": \"Wednesday 5PM\",\n  \"message\": \"Looking for Class 10 Maths tuition.\"\n}"
+      }
+    },
+    {
+      "_id": "req_my_requests",
+      "colId": "thunder-home-tutor-api",
+      "containerId": "f_requests",
+      "name": "Get My Requests (Tutor Inbox)",
+      "url": "http://localhost:5000/api/hire-requests/my-requests",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{TUTOR_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req_accept_request",
+      "colId": "thunder-home-tutor-api",
+      "containerId": "f_requests",
+      "name": "Accept Hire Request (Ownership & Slot Check)",
+      "url": "http://localhost:5000/api/hire-requests/:id/accept",
+      "method": "PATCH",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{TUTOR_TOKEN}}" }
+      ]
+    },
+    {
+      "_id": "req_reject_request",
+      "colId": "thunder-home-tutor-api",
+      "containerId": "f_requests",
+      "name": "Reject Hire Request",
+      "url": "http://localhost:5000/api/hire-requests/:id/reject",
+      "method": "PATCH",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{TUTOR_TOKEN}}" }
+      ]
+    }
+  ]
+}

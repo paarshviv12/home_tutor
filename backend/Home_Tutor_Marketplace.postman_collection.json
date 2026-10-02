@@ -1,0 +1,382 @@
+{
+  "info": {
+    "_postman_id": "9a12e345-6789-4bc0-a123-home-tutor-api",
+    "name": "Home Tutor Marketplace REST API",
+    "description": "Complete Postman collection for Home Tutor Marketplace with JWT authentication, ownership authorization, tutor search, and slot-conflict enforcement.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "parentToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tutorToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "otherTutorToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tutorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "hireRequestId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login Parent (Paarshvi)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('parentToken', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"paarshvi@example.com\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Tutor (Rahul Sharma)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('tutorToken', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rahul@gmail.com\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Other Tutor (Pooja Patel)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('otherTutorToken', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pooja@gmail.com\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{parentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Tutors",
+      "item": [
+        {
+          "name": "Search Tutors (req.query: subject & locality)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.tutors && jsonData.tutors.length > 0) {",
+                  "    pm.collectionVariables.set('tutorId', jsonData.tutors[0]._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tutors?subject=Maths&locality=Kharghar",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutors"],
+              "query": [
+                { "key": "subject", "value": "Maths" },
+                { "key": "locality", "value": "Kharghar" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Tutors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tutors",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutors"]
+            }
+          }
+        },
+        {
+          "name": "Get Tutor By ID (req.params.id)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tutors/{{tutorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutors", "{{tutorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create New Tutor Profile (POST /tutors)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Suresh Nambiar\",\n  \"email\": \"suresh@gmail.com\",\n  \"password\": \"Password@123\",\n  \"subjects\": [\"Physics\", \"Chemistry\"],\n  \"locality\": \"Kharghar\",\n  \"availableSlots\": [\"Tuesday 6PM\", \"Thursday 6PM\"],\n  \"phone\": \"+91 9988776655\",\n  \"hourlyRate\": 650\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tutors",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutors"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Hire Requests",
+      "item": [
+        {
+          "name": "Create Hire Request (Valid Slot)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.hireRequest) {",
+                  "    pm.collectionVariables.set('hireRequestId', jsonData.hireRequest._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{parentToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"subject\": \"Maths\",\n  \"slot\": \"Wednesday 5PM\",\n  \"message\": \"Looking for Class 10 Board exam coaching.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hire-requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["hire-requests"]
+            }
+          }
+        },
+        {
+          "name": "Create Hire Request (Invalid Slot - Fails 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{parentToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"subject\": \"Maths\",\n  \"slot\": \"Sunday Midnight\",\n  \"message\": \"Slot not offered by tutor\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/hire-requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["hire-requests"]
+            }
+          }
+        },
+        {
+          "name": "Get My Requests (Tutor Inbox - Only Sent to Them)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tutorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hire-requests/my-requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["hire-requests", "my-requests"]
+            }
+          }
+        },
+        {
+          "name": "Get My Requests (Parent Sent Requests)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{parentToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hire-requests/my-requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["hire-requests", "my-requests"]
+            }
+          }
+        },
+        {
+          "name": "Accept Hire Request (Unauthorized Tutor - Fails 403)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{otherTutorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hire-requests/{{hireRequestId}}/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["hire-requests", "{{hireRequestId}}", "accept"]
+            }
+          }
+        },
+        {
+          "name": "Accept Hire Request (Slot Conflict - Fails 409)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tutorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hire-requests/6abe480fc858ac6e86f9c38b/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["hire-requests", "6abe480fc858ac6e86f9c38b", "accept"]
+            }
+          }
+        },
+        {
+          "name": "Accept Hire Request (Success 200)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tutorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hire-requests/{{hireRequestId}}/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["hire-requests", "{{hireRequestId}}", "accept"]
+            }
+          }
+        },
+        {
+          "name": "Reject Hire Request (Success 200)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tutorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/hire-requests/{{hireRequestId}}/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["hire-requests", "{{hireRequestId}}", "reject"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

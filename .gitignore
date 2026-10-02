@@ -1,0 +1,13 @@
+# dependencies
+node_modules/
+
+# secrets — never commit (use backend/.env.example as the template)
+.env
+
+# uploaded resumes (user data)
+backend/uploads/
+resume-*.pdf
+
+# OS / editor junk
+.DS_Store
+*.log
