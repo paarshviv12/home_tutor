@@ -1,6 +1,6 @@
 # Home Tutor Marketplace
 
-![Home Tutor Marketplace demo](hometutor.gif)
+![Home Tutor Marketplace demo](homeTutor.gif)
 
 **Problem Statement 171** · B.Tech Computer Science Engineering · Backend Development – Node.js, Express.js & MongoDB · ITM Skills University
 
