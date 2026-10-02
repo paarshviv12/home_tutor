@@ -7,7 +7,6 @@ const tutorSchema = new mongoose.Schema({
     subjects: { type: [String], required: true },
     locality: { type: String, required: true },
     availableSlots: { type: [String], required: true },
-    // Resume uploaded with multer at sign-up — parents open it from Find Tutors
     resume: {
         fileUrl: String,
         originalName: String,

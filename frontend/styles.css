@@ -1,6 +1,5 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Black · grey · white — yellow only for what matters */
 :root {
   --black: #050505;
   --ink: #0d0d0d;
@@ -31,7 +30,6 @@ main { flex: 1; }
 .wrap { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
 .section { padding: 72px 40px 96px; }
 
-/* small uppercase label — used everywhere like the references */
 .eyebrow, .small-caps {
   font-size: 0.72rem; font-weight: 500;
   text-transform: uppercase; letter-spacing: 0.12em;
@@ -39,7 +37,6 @@ main { flex: 1; }
 }
 .small-caps { line-height: 1.7; }
 
-/* ── Header ── */
 .site-header {
   position: sticky; top: 0; z-index: 50;
   background: var(--black);
@@ -70,7 +67,6 @@ main { flex: 1; }
 }
 .account .who strong { color: var(--white); font-weight: 500; }
 
-/* ── Buttons ── */
 .btn {
   font: inherit; font-size: 0.75rem; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.12em;
@@ -92,7 +88,6 @@ main { flex: 1; }
   border: 1px solid var(--grey-300); border-radius: 999px; padding: 6px 14px;
 }
 
-/* ── Hero ── */
 .hero {
   position: relative; overflow: hidden;
   background: var(--ink);
@@ -118,7 +113,6 @@ main { flex: 1; }
   color: var(--grey-300);
 }
 
-/* ── Search band ── */
 .band { background: var(--grey-900); border-bottom: 1px solid var(--grey-800); padding: 48px 0 56px; }
 .search-row {
   display: grid; grid-template-columns: 1fr 1fr auto; gap: 48px; align-items: end;
@@ -126,7 +120,6 @@ main { flex: 1; }
 }
 .search-actions { display: flex; align-items: center; gap: 4px; }
 
-/* underline-only fields */
 .line-field { display: flex; flex-direction: column; gap: 10px; }
 input, select, textarea {
   font: inherit; font-size: 1.15rem; color: var(--white);
@@ -142,7 +135,6 @@ select { appearance: none; cursor: pointer;
 select option { background: var(--grey-900); }
 textarea { resize: vertical; }
 
-/* ── Tutors grid (boxed, shared borders) ── */
 .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
 
 .tutor-grid {
@@ -184,7 +176,6 @@ textarea { resize: vertical; }
 .empty { padding: 56px 32px; color: var(--grey-500); grid-column: 1 / -1;
   border-right: 1px solid var(--grey-700); border-bottom: 1px solid var(--grey-700); }
 
-/* ── Page heads (requests / login) ── */
 .page-top { padding-top: 80px; }
 .page-title {
   font-size: clamp(2.6rem, 7vw, 5.5rem); font-weight: 400; font-stretch: 112%;
@@ -194,7 +185,6 @@ textarea { resize: vertical; }
 .page-head-side { display: flex; flex-direction: column; align-items: flex-end; gap: 18px; text-align: right; }
 .page-head-side .small-caps { max-width: 280px; }
 
-/* ── Requests list (rule lines, no cards) ── */
 .request-list { border-top: 1px solid var(--grey-700); }
 .request {
   display: grid; grid-template-columns: 56px 1fr auto; gap: 32px; align-items: center;
@@ -216,7 +206,6 @@ textarea { resize: vertical; }
 .status-accepted { color: var(--white); border-color: var(--white); }
 .status-rejected { color: var(--grey-500); border-color: var(--grey-700); }
 
-/* ── Sign in ── */
 .auth { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
 .auth-note { margin-top: 24px; }
 .auth-form { display: flex; flex-direction: column; gap: 36px; align-items: flex-start; padding-top: 12px; }
@@ -224,7 +213,6 @@ textarea { resize: vertical; }
 .hint { font-size: 0.8rem; color: var(--grey-500); line-height: 1.8; }
 code { font-family: var(--mono); font-size: 0.78rem; color: var(--grey-300); }
 
-/* role toggle */
 .field-group { display: flex; flex-direction: column; gap: 14px; width: 100%; }
 .toggle { display: inline-flex; border: 1px solid var(--grey-700); border-radius: 999px; padding: 4px; width: fit-content; }
 .toggle-btn {
@@ -244,7 +232,6 @@ code { font-family: var(--mono); font-size: 0.78rem; color: var(--grey-300); }
   text-decoration: underline; text-underline-offset: 4px; padding: 0 0 0 6px;
 }
 
-/* file upload */
 .file-pick { display: flex; align-items: center; gap: 18px; cursor: pointer; padding: 6px 0 14px; border-bottom: 1px solid var(--grey-700); }
 .file-pick input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .file-pick:focus-within { border-bottom-color: var(--white); }
@@ -255,7 +242,6 @@ code { font-family: var(--mono); font-size: 0.78rem; color: var(--grey-300); }
 .current-resume { color: var(--grey-300); font-size: 0.92rem; margin: -16px 0 24px; }
 .current-resume a, .resume-link { color: var(--white); text-underline-offset: 4px; }
 
-/* tutor banner */
 .banner {
   display: flex; justify-content: space-between; align-items: center; gap: 24px;
   border: 1px solid var(--grey-700); padding: 22px 28px; margin-bottom: 40px;
@@ -264,7 +250,6 @@ code { font-family: var(--mono); font-size: 0.78rem; color: var(--grey-300); }
 .banner strong { color: var(--white); font-weight: 600; }
 .head-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 
-/* resume on tutor cards */
 .resume-link {
   font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
   display: inline-flex; gap: 8px; margin-top: 12px; text-decoration: none; color: var(--grey-300);
@@ -272,7 +257,6 @@ code { font-family: var(--mono); font-size: 0.78rem; color: var(--grey-300); }
 .resume-link:hover { color: var(--white); text-decoration: underline; }
 .resume-empty { display: block; margin-top: 12px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--grey-500); }
 
-/* ── Footer ── */
 .site-footer { background: var(--black); padding-top: 24px; }
 .slant { display: block; width: 100%; height: 60px; }
 .slant line { stroke: var(--grey-500); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -281,7 +265,6 @@ code { font-family: var(--mono); font-size: 0.78rem; color: var(--grey-300); }
   font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--grey-500);
 }
 
-/* ── Modal ── */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 100;
   background: rgba(0, 0, 0, 0.8);
@@ -299,7 +282,6 @@ code { font-family: var(--mono); font-size: 0.78rem; color: var(--grey-300); }
 }
 .icon-btn:hover { border-color: var(--white); color: var(--white); }
 
-/* ── Toast ── */
 .toast {
   position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 16px); z-index: 200;
   background: var(--white); color: var(--black);
@@ -310,7 +292,6 @@ code { font-family: var(--mono); font-size: 0.78rem; color: var(--grey-300); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 .toast.error { background: var(--grey-800); color: var(--white); border: 1px solid var(--grey-500); }
 
-/* ── Small screens ── */
 @media (max-width: 800px) {
   .wrap, .section { padding-left: 20px; padding-right: 20px; }
   .header-inner { grid-template-columns: 1fr auto; height: auto; padding-top: 18px; padding-bottom: 14px; row-gap: 14px; }

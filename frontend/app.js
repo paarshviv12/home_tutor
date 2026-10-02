@@ -1,13 +1,8 @@
-// ── API location ──
-// When the page is served by the Express backend (npm run dev → http://localhost:3000)
-// the API is on the same origin. If it's opened some other way (Live Server, file://),
-// send requests to the backend directly instead.
 const API_PORT = "3000";
 const API_BASE = location.protocol.startsWith("http") && location.port === API_PORT
   ? ""
   : `http://localhost:${API_PORT}`;
 
-// fetch + JSON with a readable error when the backend isn't answering
 async function api(path, options = {}) {
   let res;
   try {
@@ -26,19 +21,16 @@ async function api(path, options = {}) {
 
 const authHeaders = (extra = {}) => ({ ...extra, Authorization: `Bearer ${currentToken}` });
 
-// ── State ──
 let currentToken = "";
-let currentUser = null;   // { id, name, email, role }
+let currentUser = null;
 let allTutors = [];
-let authRole = "parent";  // which role is picked on the sign-in screen
-let authMode = "login";   // "login" | "signup"
+let authRole = "parent";
+let authMode = "login";
 
 const $ = (id) => document.getElementById(id);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-
-// ── Session (kept in localStorage so a refresh doesn't log you out) ──
 function saveSession() {
   try {
     if (currentToken) localStorage.setItem("htm-session", JSON.stringify({ currentToken, currentUser }));
@@ -52,10 +44,6 @@ function loadSession() {
   } catch (_) {}
 }
 
-// ── Navigation (what each role is allowed to see) ──
-//   signed out → Find tutors (+ sign in)
-//   parent     → Find tutors + My requests
-//   tutor      → Requests only
 const isTutor = () => currentUser?.role === "tutor";
 
 function homeTab() { return isTutor() ? "requests" : "search"; }
@@ -67,28 +55,24 @@ function switchTab(tab) {
   ["search", "requests", "login"].forEach((t) => { $(`view-${t}`).hidden = t !== tab; });
   ["search", "requests"].forEach((t) => $(`tab-${t}-btn`).classList.toggle("active", t === tab));
   if (tab === "requests") loadMyRequests();
-  if (tab === "search") searchTutors(); // always show fresh tutors/resumes
+  if (tab === "search") searchTutors();
   window.scrollTo(0, 0);
 }
 
 function renderChrome() {
-  // nav links
   $("tab-search-btn").hidden = isTutor();
   $("tab-requests-btn").hidden = !currentUser;
   $("tab-requests-btn").textContent = isTutor() ? "Requests" : "My requests";
 
-  // account area
   const area = $("account-area");
   area.innerHTML = currentUser
     ? `<span class="who"><strong>${esc(currentUser.name || currentUser.email)}</strong> · ${esc(currentUser.role)}</span>
        <button class="btn btn-outline btn-sm" onclick="logout()">Sign out</button>`
     : `<button class="btn btn-outline btn-sm" onclick="setAuthMode('login'); switchTab('login')">Sign in</button>`;
 
-  // requests page bits
   $("requests-view-title").textContent = isTutor() ? "Incoming requests" : "My requests";
 }
 
-// ── File picker ──
 function showFileName(input) {
   const label = input.parentElement.querySelector(".file-name");
   const f = input.files[0];
@@ -110,7 +94,6 @@ function checkResumeFile(file) {
   return "";
 }
 
-// ── Sign in / create account ──
 function setAuthRole(role) {
   authRole = role;
   document.querySelectorAll(".toggle-btn").forEach((b) => b.classList.toggle("active", b.dataset.role === role));
@@ -167,7 +150,6 @@ async function handleAuth() {
       if (fileError) return toast(fileError, "error");
       if (!subjects || !locality || !slots) return toast("Add your subjects, locality and slots", "error");
 
-      // multipart/form-data so multer can read the file (field name "resume")
       const form = new FormData();
       form.append("role", "tutor");
       form.append("name", name);
@@ -177,7 +159,7 @@ async function handleAuth() {
       form.append("locality", locality);
       form.append("availableSlots", slots);
       form.append("resume", file);
-      options = { method: "POST", body: form }; // browser sets the multipart header
+      options = { method: "POST", body: form };
     } else {
       options.body = JSON.stringify({ name, email, password, role: "parent" });
     }
@@ -212,7 +194,6 @@ function logout() {
 
 const fileHref = (url) => API_BASE + url;
 
-// ── Tutors (parent view) ──
 async function searchTutors() {
   const params = new URLSearchParams();
   const subject = $("search-subject").value.trim();
@@ -270,7 +251,6 @@ function renderTutors(tutors) {
     </article>`).join("");
 }
 
-// ── Hire modal ──
 function openHireModal(id) {
   if (!currentUser) { toast("Sign in as a parent to send a request"); setAuthRole("parent"); return switchTab("login"); }
   if (currentUser.role !== "parent") return toast("Only parent accounts can send requests", "error");
@@ -307,7 +287,6 @@ async function submitHireRequest() {
   } catch (err) { toast(err.message, "error"); }
 }
 
-// ── Requests ──
 async function loadMyRequests() {
   const list = $("requests-list");
   if (!currentUser) return;
@@ -363,7 +342,6 @@ async function respond(id, action) {
   } catch (err) { toast(err.message, "error"); }
 }
 
-// ── Toast ──
 let toastTimer;
 function toast(msg, type = "") {
   const el = $("toast");
@@ -373,7 +351,6 @@ function toast(msg, type = "") {
   toastTimer = setTimeout(() => { el.className = "toast"; }, 3500);
 }
 
-// ── Start ──
 window.addEventListener("DOMContentLoaded", async () => {
   renderAuthForm();
   loadSession();

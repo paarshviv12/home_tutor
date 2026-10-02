@@ -1,7 +1,6 @@
 const HireRequest = require("../models/HireRequest");
 const Tutor = require("../models/Tutor");
 
-// POST /api/hire-requests — a parent sends a request (validated before saving)
 const createHireRequest = async (req, res) => {
     try {
         const { tutor, subject, slot, message } = req.body;
@@ -22,7 +21,6 @@ const createHireRequest = async (req, res) => {
     }
 };
 
-// GET /api/hire-requests/my-requests — parents see what they sent, tutors see what they received
 const getMyRequests = async (req, res) => {
     try {
         const filter = req.user.role === "parent" ? { parent: req.user.id } : { tutor: req.user.id };
@@ -36,12 +34,10 @@ const getMyRequests = async (req, res) => {
     }
 };
 
-// PATCH /api/hire-requests/:id/accept — ownership already checked; req.hireRequest set by ownershipMiddleware
 const acceptHireRequest = async (req, res) => {
     try {
         const request = req.hireRequest;
 
-        // Business rule: only one accepted student per tutor per time slot
         const slotTaken = await HireRequest.findOne({ tutor: request.tutor, slot: request.slot, status: "accepted" });
         if (slotTaken) {
             return res.status(409).json({ message: "Tutor already has an accepted student for this time slot" });
@@ -55,7 +51,6 @@ const acceptHireRequest = async (req, res) => {
     }
 };
 
-// PATCH /api/hire-requests/:id/reject
 const rejectHireRequest = async (req, res) => {
     try {
         req.hireRequest.status = "rejected";

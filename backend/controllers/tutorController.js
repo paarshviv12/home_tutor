@@ -1,11 +1,10 @@
 const Tutor = require("../models/Tutor");
 
-// GET /api/tutors?subject=Maths&locality=Kharghar
 const getTutors = async (req, res) => {
     try {
         const { subject, locality } = req.query;
         const filter = {};
-        if (subject) filter.subjects = subject; // matches tutors whose subjects array contains it
+        if (subject) filter.subjects = subject;
         if (locality) filter.locality = locality;
 
         res.json(await Tutor.find(filter).select("-password"));
@@ -14,7 +13,6 @@ const getTutors = async (req, res) => {
     }
 };
 
-// GET /api/tutors/:id
 const getTutorById = async (req, res) => {
     try {
         const tutor = await Tutor.findById(req.params.id).select("-password");
@@ -25,7 +23,6 @@ const getTutorById = async (req, res) => {
     }
 };
 
-// POST /api/tutors — quick way to add a tutor from Postman
 const createTutor = async (req, res) => {
     try {
         const { password, ...tutor } = (await Tutor.create(req.body)).toObject();

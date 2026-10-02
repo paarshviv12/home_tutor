@@ -14,7 +14,6 @@ const seedDatabase = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB.");
 
-    // Clear existing data
     await HireRequest.deleteMany({});
     await Tutor.deleteMany({});
     await Parent.deleteMany({});
@@ -22,7 +21,6 @@ const seedDatabase = async () => {
 
     const defaultPassword = await bcrypt.hash("Password@123", 10);
 
-    // Create Parents
     const parent1 = await Parent.create({
       name: "Paarshvi Vijoy",
       email: "paarshvi@example.com",
@@ -37,7 +35,6 @@ const seedDatabase = async () => {
 
     console.log(`Created 2 Parents: ${parent1.name}, ${parent2.name}`);
 
-    // Create Tutors
     const tutor1 = await Tutor.create({
       name: "Rahul Sharma",
       email: "rahul@gmail.com",
@@ -67,8 +64,6 @@ const seedDatabase = async () => {
 
     console.log(`Created 3 Tutors: ${tutor1.name}, ${tutor2.name}, ${tutor3.name}`);
 
-    // Create Sample Hire Requests
-    // 1. Accepted request: Paarshvi hired Rahul for Monday 5PM
     const req1 = await HireRequest.create({
       tutor: tutor1._id,
       parent: parent1._id,
@@ -78,7 +73,6 @@ const seedDatabase = async () => {
       status: "accepted"
     });
 
-    // 2. Pending request conflicting on the same slot (Monday 5PM) with Rahul!
     const req2 = await HireRequest.create({
       tutor: tutor1._id,
       parent: parent2._id,
@@ -88,7 +82,6 @@ const seedDatabase = async () => {
       status: "pending"
     });
 
-    // 3. Pending request on a free slot (Wednesday 5PM) for Rahul
     const req3 = await HireRequest.create({
       tutor: tutor1._id,
       parent: parent2._id,

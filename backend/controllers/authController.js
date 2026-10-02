@@ -3,16 +3,13 @@ const bcrypt = require("bcryptjs");
 const Parent = require("../models/Parent");
 const Tutor = require("../models/Tutor");
 
-// "Maths, Physics" → ["Maths", "Physics"]
 const toList = (value) => String(value || "").split(",").map((v) => v.trim()).filter(Boolean);
 
-// Token + user details sent back after register and login
 const authReply = (user, role) => ({
     token: jwt.sign({ id: user._id, role, email: user.email }, process.env.JWT_SECRET || "mysecretkey", { expiresIn: "7d" }),
     user: { id: user._id, name: user.name, email: user.email, role }
 });
 
-// POST /api/auth/register — parents send JSON; tutors send multipart form data with a "resume" file
 const register = async (req, res) => {
     try {
         const { name, email, password, role = "parent", locality } = req.body || {};
@@ -55,7 +52,6 @@ const register = async (req, res) => {
     }
 };
 
-// POST /api/auth/login — role "parent" or "tutor" picks which collection to search
 const login = async (req, res) => {
     try {
         const { email, password, role } = req.body || {};
@@ -63,7 +59,6 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Email and password are required" });
         }
 
-        // No role given (e.g. Postman) → try parent first, then tutor
         let user = role !== "tutor" ? await Parent.findOne({ email }) : null;
         let foundRole = "parent";
         if (!user && role !== "parent") {

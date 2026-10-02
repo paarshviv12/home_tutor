@@ -1,7 +1,6 @@
 const multer = require("multer");
 const path = require("path");
 
-// Accepted resume types → file extension
 const ALLOWED = {
     "application/pdf": ".pdf",
     "application/msword": ".doc",
@@ -12,15 +11,14 @@ const ALLOWED = {
 
 const upload = multer({
     storage: multer.diskStorage({
-        destination: path.join(__dirname, "..", "uploads", "resumes"), // multer creates this folder
+        destination: path.join(__dirname, "..", "uploads", "resumes"),
         filename: (req, file, cb) => cb(null, `resume-${Date.now()}-${Math.round(Math.random() * 1e9)}${ALLOWED[file.mimetype]}`)
     }),
     fileFilter: (req, file, cb) =>
         ALLOWED[file.mimetype] ? cb(null, true) : cb(new Error("Resume must be a PDF, Word document, PNG or JPG")),
-    limits: { fileSize: 5 * 1024 * 1024 } // 5 MB
+    limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-// Reads the "resume" field; any upload error comes back as a 400 JSON message
 const uploadResume = (req, res, next) =>
     upload.single("resume")(req, res, (err) => {
         if (!err) return next();
