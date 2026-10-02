@@ -70,8 +70,6 @@ FINAL_BACKEND/
 | GET | `/api/tutors?subject=&locality=` | – | Search and filter tutors |
 | GET | `/api/tutors/:id` | – | Get one tutor |
 | POST | `/api/tutors` | – | Create a tutor (testing) |
-| GET | `/api/tutors/me` | JWT (tutor) | Signed-in tutor's profile |
-| PUT | `/api/tutors/me/resume` | JWT (tutor) | Replace resume file |
 | POST | `/api/hire-requests` | JWT (parent) | Send a hire request (validated) |
 | GET | `/api/hire-requests/my-requests` | JWT | Parent: sent requests · Tutor: received requests |
 | PATCH | `/api/hire-requests/:id/accept` | JWT + ownership | Accept (409 if the slot is already taken) |

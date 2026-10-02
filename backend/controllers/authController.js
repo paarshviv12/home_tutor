@@ -2,132 +2,82 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Parent = require("../models/Parent");
 const Tutor = require("../models/Tutor");
-const { resumeFromFile } = require("../middleware/uploadMiddleware");
 
-const signToken = (user, role) =>
-    jwt.sign(
-        { id: user._id, role, email: user.email },
-        process.env.JWT_SECRET || "mysecretkey",
-        { expiresIn: "7d" }
-    );
+// "Maths, Physics" → ["Maths", "Physics"]
+const toList = (value) => String(value || "").split(",").map((v) => v.trim()).filter(Boolean);
 
-const toList = (value) =>
-    Array.isArray(value)
-        ? value.map((v) => String(v).trim()).filter(Boolean)
-        : String(value || "").split(",").map((v) => v.trim()).filter(Boolean);
+// Token + user details sent back after register and login
+const authReply = (user, role) => ({
+    token: jwt.sign({ id: user._id, role, email: user.email }, process.env.JWT_SECRET || "mysecretkey", { expiresIn: "7d" }),
+    user: { id: user._id, name: user.name, email: user.email, role }
+});
 
-// POST /api/auth/register  — body.role = "parent" (default) or "tutor"
+// POST /api/auth/register — parents send JSON; tutors send multipart form data with a "resume" file
 const register = async (req, res) => {
     try {
-        const body = req.body || {}; // undefined in Express 5 when no body parser ran
-        const { name, email, password, role = "parent" } = body;
-
+        const { name, email, password, role = "parent", locality } = req.body || {};
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Name, email and password are required" });
         }
-
-        const taken = (await Parent.findOne({ email })) || (await Tutor.findOne({ email }));
-        if (taken) {
+        if ((await Parent.findOne({ email })) || (await Tutor.findOne({ email }))) {
             return res.status(400).json({ message: "An account with this email already exists" });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashed = await bcrypt.hash(password, 10);
 
-        if (role === "tutor") {
-            const subjects = toList(body.subjects);
-            const availableSlots = toList(body.availableSlots);
-            const { locality } = body;
-
-            if (!subjects.length || !locality || !availableSlots.length) {
-                return res.status(400).json({ message: "Subjects, locality and at least one slot are required" });
-            }
-            if (!req.file) {
-                return res.status(400).json({ message: "Please upload your resume (PDF, Word, PNG or JPG)" });
-            }
-
-            const tutor = await Tutor.create({
-                name,
-                email,
-                password: hashedPassword,
-                subjects,
-                locality,
-                availableSlots,
-                resume: resumeFromFile(req.file)
-            });
-
-            return res.status(201).json({
-                message: "Tutor registered successfully",
-                token: signToken(tutor, "tutor"),
-                user: { id: tutor._id, name: tutor.name, email: tutor.email, role: "tutor" }
-            });
+        if (role !== "tutor") {
+            const parent = await Parent.create({ name, email, password: hashed });
+            return res.status(201).json({ message: "Parent registered", ...authReply(parent, "parent") });
         }
 
-        const parent = await Parent.create({
-            name,
-            email,
-            password: hashedPassword
-        });
+        const subjects = toList(req.body.subjects);
+        const availableSlots = toList(req.body.availableSlots);
+        if (!subjects.length || !locality || !availableSlots.length) {
+            return res.status(400).json({ message: "Subjects, locality and at least one slot are required" });
+        }
+        if (!req.file) {
+            return res.status(400).json({ message: "Please upload your resume (PDF, Word, PNG or JPG)" });
+        }
 
-        res.status(201).json({
-            message: "User registered successfully",
-            token: signToken(parent, "parent"),
-            user: { id: parent._id, name: parent.name, email: parent.email, role: "parent" }
+        const tutor = await Tutor.create({
+            name, email, password: hashed, subjects, locality, availableSlots,
+            resume: {
+                fileUrl: `/uploads/resumes/${req.file.filename}`,
+                originalName: req.file.originalname,
+                mimeType: req.file.mimetype,
+                size: req.file.size,
+                uploadedAt: new Date()
+            }
         });
+        res.status(201).json({ message: "Tutor registered", ...authReply(tutor, "tutor") });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
 
+// POST /api/auth/login — role "parent" or "tutor" picks which collection to search
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body || {};
-
+        const { email, password, role } = req.body || {};
         if (!email || !password) {
             return res.status(400).json({ message: "Email and password are required" });
         }
 
-        // If the person picked "Parent" or "Tutor" on the sign-in screen, only look there
-        const wanted = (req.body || {}).role;
-        let user = null;
-        let role = "parent";
-
-        if (wanted !== "tutor") {
-            user = await Parent.findOne({ email });
-        }
-        if (!user && wanted !== "parent") {
+        // No role given (e.g. Postman) → try parent first, then tutor
+        let user = role !== "tutor" ? await Parent.findOne({ email }) : null;
+        let foundRole = "parent";
+        if (!user && role !== "parent") {
             user = await Tutor.findOne({ email });
-            role = "tutor";
+            foundRole = "tutor";
         }
 
-        if (!user) {
-            return res.status(400).json({
-                message: wanted ? `No ${wanted} account found with this email` : "User not found"
-            });
-        }
+        if (!user) return res.status(400).json({ message: role ? `No ${role} account found with this email` : "User not found" });
+        if (!(await bcrypt.compare(password, user.password))) return res.status(400).json({ message: "Invalid credentials" });
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        const token = signToken(user, role);
-
-        res.json({
-            message: "Login successful",
-            token,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role
-            }
-        });
+        res.json({ message: "Login successful", ...authReply(user, foundRole) });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-module.exports = {
-    register,
-    login
-};
+module.exports = { register, login };

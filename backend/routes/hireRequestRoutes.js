@@ -1,8 +1,6 @@
-const express = require("express");
-const router = express.Router();
-const authMiddleware = require("../middleware/authMiddleware");
-const ownershipMiddleware = require("../middleware/ownershipMiddleware");
-
+const router = require("express").Router();
+const auth = require("../middleware/authMiddleware");
+const ownership = require("../middleware/ownershipMiddleware");
 const {
     createHireRequest,
     getMyRequests,
@@ -10,9 +8,9 @@ const {
     rejectHireRequest
 } = require("../controllers/hireRequestController");
 
-router.post("/", authMiddleware, createHireRequest);
-router.get("/my-requests", authMiddleware, getMyRequests);
-router.patch("/:id/accept", authMiddleware, ownershipMiddleware, acceptHireRequest);
-router.patch("/:id/reject", authMiddleware, ownershipMiddleware, rejectHireRequest);
+router.post("/", auth, createHireRequest);
+router.get("/my-requests", auth, getMyRequests);
+router.patch("/:id/accept", auth, ownership, acceptHireRequest);
+router.patch("/:id/reject", auth, ownership, rejectHireRequest);
 
 module.exports = router;

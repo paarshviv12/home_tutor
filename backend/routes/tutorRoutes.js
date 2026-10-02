@@ -1,19 +1,7 @@
-const express = require("express");
-const router = express.Router();
-const authMiddleware = require("../middleware/authMiddleware");
-const { uploadResume } = require("../middleware/uploadMiddleware");
-
-const {
-    getTutors,
-    getTutorById,
-    createTutor,
-    getMyProfile,
-    updateMyResume
-} = require("../controllers/tutorController");
+const router = require("express").Router();
+const { getTutors, getTutorById, createTutor } = require("../controllers/tutorController");
 
 router.get("/", getTutors);
-router.get("/me", authMiddleware, getMyProfile);          // must come before /:id
-router.put("/me/resume", authMiddleware, uploadResume, updateMyResume);
 router.get("/:id", getTutorById);
 router.post("/", createTutor);
 
